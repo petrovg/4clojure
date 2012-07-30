@@ -98,3 +98,16 @@ filter odd?
 ;; Last element
 
 #(-> % reverse first)
+
+
+
+;; Pascal's triangle
+
+;; Note, the solution is the function, not the whole form
+((fn pascal [n]
+    (letfn [(next-pascal [this-pascal]
+                         (map (fn [[a b]] (+ a b))
+                              (partition 2 1
+                                         (concat [0] this-pascal [0]))))]
+      (apply vector (last (take n (iterate next-pascal [1]))))))
+ 1)
