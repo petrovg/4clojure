@@ -137,8 +137,25 @@ filter odd?
      (digits (* a b) '())))
  999 99)
 
-(mod 1056 10)
-(rem 1056 10)
-(mod -1056 10)
-(rem -1056 10)
-(int (/ 1056 10))
+
+
+;; Least common multiple
+
+;; This one fails the test for some fraction. Need a better one that
+;; doesn't assume integers
+((fn [& xs]
+   (let [filt (apply every-pred
+                     (map #(fn [x] (zero? (mod x %))) xs))]
+     (first (filter filt (iterate #(+ % (min (apply min xs) 1)) 1)))))
+ 3/4 1/6)
+
+;; This
+((fn [& xs]
+   (letfn [(comb [c r]
+                 (if (= (count c) 2)
+                   r
+                   (recur (rest c) (concat r (for [a c b c :when (not (= a b))] [a b])))))]
+     (comb xs [])))
+ 1 2 3 4)
+
+
