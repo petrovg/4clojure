@@ -111,3 +111,14 @@ filter odd?
                                          (concat [0] this-pascal [0]))))]
       (apply vector (last (take n (iterate next-pascal [1]))))))
  1)
+
+
+;; Equivalence classes
+
+((fn [f d]
+   (set
+    (map #(set (map :x %))
+         (partition-by :y (sort-by :y (map #(hash-map :x % :y (f %)) d))))))
+ #(* % %) #{-2 -1 0 1 2})
+
+
