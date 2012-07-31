@@ -122,3 +122,23 @@ filter odd?
  #(* % %) #{-2 -1 0 1 2})
 
 
+
+;; Product digits
+
+((fn [a b]
+   (map #(Integer/parseInt %) (map str (str (* a b)))))
+ 999 99)
+
+
+((fn [a b]
+   (letfn [(digits [n s]
+                   (if (= n 0) s
+                       (recur (int (/ n 10)) (conj s (rem n 10)))))]
+     (digits (* a b) '())))
+ 999 99)
+
+(mod 1056 10)
+(rem 1056 10)
+(mod -1056 10)
+(rem -1056 10)
+(int (/ 1056 10))
