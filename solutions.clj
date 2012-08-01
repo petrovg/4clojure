@@ -160,3 +160,18 @@ filter odd?
  3/4 1/6)
 
 
+
+;; Happy numbers
+
+((fn [n]
+   (letfn [(digits
+            ([n s] ;;Copied from above, recursive, init with s
+               (if (= n 0) s
+                   (recur (int (/ n 10)) (conj s (rem n 10)))))
+            ([n]
+               (digits n '())))
+           (next [n]
+                 (reduce + (map #(* % %) (digits n))))]
+     (= 1 (first (drop-while #(not (= 1 %)) (take 100000 (iterate next n)))))
+     ))
+ 72)
