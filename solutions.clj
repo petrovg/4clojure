@@ -149,13 +149,14 @@ filter odd?
      (first (filter filt (iterate #(+ % (min (apply min xs) 1)) 1)))))
  3/4 1/6)
 
-;; This
-((fn [& xs]
-   (letfn [(comb [c r]
-                 (if (= (count c) 2)
-                   r
-                   (recur (rest c) (concat r (for [a c b c :when (not (= a b))] [a b])))))]
-     (comb xs [])))
- 1 2 3 4)
+;; This is better
+((fn [& c]
+   (let [multiples (into {} (map #(vector % (range % 10000 %)) c))
+         min-multiple (multiples (apply min c))
+         not-in-range-fn (fn [range] (fn [x] (not (contains? (set range) x))))
+         contains-preds (map not-in-range-fn (vals multiples))]
+     (first (drop-while (apply some-fn contains-preds)
+                        min-multiple))))
+ 3/4 1/6)
 
 
