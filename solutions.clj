@@ -163,7 +163,7 @@ filter odd?
 
 ;; Happy numbers
 
-((fn [n]
+((fn happy-numbers [n]
    (letfn [(digits
             ([n s] ;;Copied from above, recursive, init with s
                (if (= n 0) s
@@ -174,4 +174,21 @@ filter odd?
                  (reduce + (map #(* % %) (digits n))))]
      (= 1 (first (drop-while #(not (= 1 %)) (take 100000 (iterate next n)))))
      ))
- 72)
+ 7)
+
+
+
+;; Flipping out
+
+(((fn reverse-args [fun]
+     (fn [& args] (apply fun (reverse args))))
+  nth) 2 [1 2 3 4 5])
+
+
+
+
+;; Interpose a seq
+
+((fn [v col]
+   (drop 1 (mapcat (partial vector v) col)))
+ 0 [1 2 3])
