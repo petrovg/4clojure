@@ -212,6 +212,11 @@ filter odd?
    (apply (partial mapcat vector) (repeat n c)))
  [1 2 3] 3)
 
+;; Duplicating
+
+((fn [c]
+   (mapcat vector c c))
+ [1 2 3])
 
 
 
@@ -228,3 +233,64 @@ filter odd?
 ((fn [c]
     (partition-by identity c))
  [1 1 2 1 1 1 3 3])
+
+
+
+;; Maximum value
+
+((fn mymax [& xs]
+   (letfn [(_mymax [c m]
+                    (if (seq c)
+                      (recur (rest c) (if (> (first c) m) (first c) m))
+                      m))]
+     (_mymax xs (first xs))))
+ 1 3 55 3)
+
+
+
+;; Interleave two seqs
+
+((fn [s1 s2]
+   (mapcat vector s1 s2))
+ [1 2 3] [:a :b :c])
+
+
+
+;; Factorial
+
+((fn fact [n]
+   (letfn [(_fact [f i]
+                  (if (<= i 0)
+                    f
+                    (do (println "next is " (dec i) ", " (* n i)) (recur (* f i) (dec i) ))))]
+     (_fact 1 n)))
+ 8)
+
+
+
+;; Reverse interleave
+
+;; Study/draft 1
+((fn [c]
+   (let [p (partition 2 c)]
+     (list (map first p) (map second p))))
+ [1 :a 2 :b 3 :c])
+
+;; Study/draft 2
+((fn [c]
+   (let [p (partition-all 3 c)]
+     (list (map first p) (map second p) (map #(nth % 2) p))))
+ [1 :a 2 :b 3 :c])
+
+;; Study/draft 3
+((fn [c]
+   (let [p (partition-all 4 c)]
+     (list (map #(nth % 0) p) (map #(nth % 1) p) (map #(nth % 2) p) (map #(nth % 3) p))))
+ [1 10 :a :Z 2 20 :b :Y 3 30 :c :X])
+
+;; Solution
+((fn [c n]
+   (let [p (partition-all n c)
+         slicer-fns (for [pos (range 0 n)] (fn [l] (nth l pos)))]
+     (map #(map % p) slicer-fns)))
+ [1 10 :a :Z 2 20 :b :Y 3 30 :c :X] 4)
