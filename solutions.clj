@@ -294,3 +294,46 @@ filter odd?
          slicer-fns (for [pos (range 0 n)] (fn [l] (nth l pos)))]
      (map #(map % p) slicer-fns)))
  [1 10 :a :Z 2 20 :b :Y 3 30 :c :X] 4)
+
+
+
+;; Rotate sequence
+
+;; Study/draft
+(time
+ ( (fn rotate [n c]
+     (take (count c) (drop n (concat c c))))
+   2 [1 2 3 4 5]))
+
+;; Study/draft
+((fn rotate [n c]
+   (let [reordered (if (< n 0) (reverse c) c)
+         r (take (count c) (drop (if (< n 0) (- n) n) (apply concat (repeat 5 reordered))))]
+     (if (> n 0)
+       r
+       (reverse r))))
+ ;;6 [1 2 3 4 5]
+ ;;1 '(:a :b :c)
+ -4 '(:a :b :c)
+ )
+
+
+;; Split a sequence
+
+((fn [n c]
+    [(take n c) (drop n c)])
+ 3 [1 2 3 4 5 6]
+ ;;1 [:a :b :c :d]
+ ;;2 [[1 2] [3 4] [5 6]]
+ )
+
+;; Recursive, just for practice
+((fn mysplit [n c]
+   (letfn [(_mysplit [a b]
+                     (let [va (vec a)
+                           lb (apply list b)]
+                       (if (= n (count va))
+                         [va lb]
+                         (recur (butlast va) (conj lb (last va))))))]
+     (_mysplit c [])))
+ 3 [1 2 3 4 5 6])
