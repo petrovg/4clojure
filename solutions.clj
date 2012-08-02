@@ -192,3 +192,39 @@ filter odd?
 ((fn [v col]
    (drop 1 (mapcat (partial vector v) col)))
  0 [1 2 3])
+
+
+
+;; Drop every nth item
+
+((fn [col n]
+   (take-while #(not (nil? %))
+               (mapcat butlast (partition n n (repeat nil) col))))
+ ;;[1 2 3 4 5 6 7 8] 3
+ [1 2 3 4 5 6] 4
+ )
+
+
+
+;; Replicate a sequence
+
+((fn [c n]
+   (apply (partial mapcat vector) (repeat n c)))
+ [1 2 3] 3)
+
+
+
+
+;; Implement range
+
+((fn [b e]
+    (take (- e b) (iterate inc b)))
+ 1 4)
+
+
+
+;; Pack a sequence
+
+((fn [c]
+    (partition-by identity c))
+ [1 1 2 1 1 1 3 3])
