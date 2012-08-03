@@ -297,6 +297,7 @@ filter odd?
 
 
 
+
 ;; Rotate sequence
 
 ;; Study/draft
@@ -337,3 +338,123 @@ filter odd?
                          (recur (butlast va) (conj lb (last va))))))]
      (_mysplit c [])))
  3 [1 2 3 4 5 6])
+
+
+
+
+;; Through the looking class
+
+(let [x java.lang.Class]
+  (and (= (class x) x) x))
+
+
+
+
+
+;; Read a binary number
+
+(time
+ ((fn [s]
+    (let [digits (map {\1 1 \0 0} (reverse s))
+          powers-of-2 (map #(long (Math/pow 2 %)) (range 0 32))]
+      (reduce + (map * digits powers-of-2))))
+  "10101010101"))
+
+
+
+
+
+;; Re-implement iterate
+
+(letfn [(myiterate [f v]
+                   (let [fv (f v)]
+                     (lazy-seq (cons v (myiterate f (f v))))))]
+  (take 20 (drop 100 (myiterate #(+ % 3) 3))))
+
+
+(take 5 ( (fn myiterate [f v]
+            (let [fv (f v)]
+              (lazy-seq (cons v (myiterate f (f v))))))
+          #(+ 3 %) 1))
+
+
+
+
+
+;; Word sorting
+
+((fn [text]
+   (map :o (sort-by :u (map #(hash-map :o % :u (.toUpperCase %)) (re-seq #"[a-zA-Z]+" text)))))
+ "Have a nice day.")
+
+
+
+
+
+;; Merge with a function
+
+;; Study/draft
+((fn [& maps]
+   (reduce (fn [a b] (apply (partial assoc a) (flatten (into [] b)))) maps))
+ {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
+
+;; Study/draft
+((fn [fn & maps]
+   (reduce
+    (fn [a b]
+      (let [new-vals
+            (concat
+             (for [[b-key b-val] b]
+               [b-key
+                (if (a b-key)
+                  (f (a b-key) (b b-key))
+                  b-val)]))]
+        (apply (partial assoc a) new-vals)))
+    maps))
+ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
+
+;; Useful function in itself, this conbines merges two maps using the
+;; function f. Reducing a bunch of maps with it should be this
+;; problem's colution
+((fn [a b f]
+   (let [new-vals (map (fn [[k v]] [k (if (a k) (f (a k) v) v)]) b)
+         new-vals-flat (apply concat new-vals)] ;; flatten
+     (apply (partial assoc a) new-vals-flat)))
+ {:a 2, :b 3, :c 4} {:a 3 :d 6} *)
+
+;; Like this (the solution):
+((fn [f & maps]
+   (reduce
+    (fn [a b]
+      (let [new-vals (map (fn [[k v]] [k (if (a k) (f (a k) v) v)]) b)
+            new-vals-flat (apply concat new-vals)] ;; flatten
+        (apply (partial assoc a) new-vals-flat)))
+    maps))
+ * {:a 2, :b 3, :c 4} {:a 3 :d 6} {:b 7})
+
+
+
+
+
+
+;; The balance of N
+;; Uses the digits function from above
+
+((fn [n]
+   (let [digit-fn (fn digits [n s]
+                    (if (= n 0) s
+                        (recur (int (/ n 10)) (conj s (rem n 10)))))
+         digit-seq (digit-fn n '() )
+         half (int (/ (count digit-seq) 2))
+         sum-first-half-fn (fn [seq] (reduce + (take half seq)))]
+     (= (sum-first-half-fn digit-seq)
+        (sum-first-half-fn (reverse digit-seq)))))
+ 1298912)
+
+
+
+;; Rearranging code
+
+(= (reduce + (map inc (take 3 (drop 2 [2 5 4 1 3 6]))))
+   (->> [2 5 4 1 3 6] (drop 2) (take 3) (map inc) (reduce +))
+   11)
